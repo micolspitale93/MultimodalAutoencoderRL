@@ -173,14 +173,14 @@ class MultimodalAutoencoder:
 
         # Override settings necessary for VAE
         if self.variational:
-            if self.verbose: print "Building VAE. Will use 0-1 normalization, cross entropy loss, and will not tie weights.\n"
+            if self.verbose: print("Building VAE. Will use 0-1 normalization, cross entropy loss, and will not tie weights.\n")
             self.tie_weights = False
             self.normalization = 'between_0_and_1'
             self.loss_func = 'sigmoid_cross_entropy'
 
         if self.normalization == 'z_score' and (loss_func == 'cross_entropy' 
                                            or loss_func == 'sigmoid_cross_entropy'):
-            print "ERROR! Cannot use cross entropy loss with z-score data. Changing normalization method to 0-1"
+            print("ERROR! Cannot use cross entropy loss with z-score data. Changing normalization method to 0-1")
             self.normalization = 'between_0_and_1'
 
         # Extract the data from the filename
@@ -193,12 +193,12 @@ class MultimodalAutoencoder:
                     normalization=self.normalization,
                     fill_missing_with=self.fill_missing_with)
         else: 
-            print "ERROR! Must set either filename or data_loader to a value so that MMAE has access to data."
+            print("ERROR! Must set either filename or data_loader to a value so that MMAE has access to data.")
             return 
         self.extra_noisy_data_loader = None
 
         if self.intelligent_noise:
-            print "Using intelligent noise"
+            print("Using intelligent noise")
             self.noise_type_percentages = [ 0.64018104,  0.03168217,  0.25119437,  0.07694242]
             self.noise_types = [[],
                                 ['call','sms','screen'],
@@ -206,7 +206,7 @@ class MultimodalAutoencoder:
                                 ['location','call','sms','screen']]
 
         if self.classification_layer_sizes is not None:
-            if self.verbose: print "Okay, preparing model to perform classification"
+            if self.verbose: print("Okay, preparing model to perform classification")
             self.train_acc = []
             self.val_acc = []
             self.classification_train_loss = []
@@ -344,7 +344,7 @@ class MultimodalAutoencoder:
     def build_graph(self):
         """Constructs the tensorflow computation graph containing all variables
         that will be trained."""
-        if self.verbose: print '\nBuilding computation graph...'
+        if self.verbose: print('\nBuilding computation graph...')
 
         with self.graph.as_default():
             # Data placeholder
@@ -432,7 +432,7 @@ class MultimodalAutoencoder:
                 self.classification_loss = tf.reduce_mean(
                     tf.nn.sigmoid_cross_entropy_with_logits(logits=self.logits, labels=self.true_Y))
             else:
-                print "Using softmax CE loss for classification"
+                print("Using softmax CE loss for classification")
                 
                 self.classification_loss = tf.reduce_mean(
                     tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.int_true_Y))
@@ -577,9 +577,9 @@ class MultimodalAutoencoder:
                     self.val_loss.append(val_loss)
 
                     if self.verbose:
-                        print "Training iteration", step
-                        print "\t Training loss", train_loss
-                        print "\t Validation loss", val_loss
+                        print("Training iteration", step)
+                        print("\t Training loss", train_loss)
+                        print("\t Validation loss", val_loss)
 
                 if step > 0 and step % self.save_every_nth == 0:
                     # Save a checkpoint of the model
@@ -632,11 +632,11 @@ class MultimodalAutoencoder:
                     self.classification_val_loss.append(val_loss)
 
                     if self.verbose:
-                        print "Training iteration", step
-                        print "\t Training loss", train_loss
-                        print "\t Validation loss", val_loss
-                        print "\t Training accuracy", train_acc
-                        print "\t Validation accuracy", val_acc
+                        print("Training iteration", step)
+                        print("\t Training loss", train_loss)
+                        print("\t Validation loss", val_loss)
+                        print("\t Training accuracy", train_acc)
+                        print("\t Validation accuracy", val_acc)
 
                 if step > 0 and step % self.save_every_nth == 0:
                     # Save a checkpoint of the model
@@ -772,7 +772,7 @@ class MultimodalAutoencoder:
             directory: Directory where the checkpoint will be saved. Defaults to
                 self.checkpoint_dir if None is provided.
         """
-        if self.verbose: print "Saving model..."
+        if self.verbose: print("Saving model...")
         if file_name is None:
             file_name = self.model_name
 
@@ -813,7 +813,7 @@ class MultimodalAutoencoder:
             rewards are saved. If None, will not attempt to load stored
             rewards.
         """
-        print "-----Loading saved model-----"
+        print("-----Loading saved model-----")
         if directory is None:
             directory = self.output_dir
 
@@ -821,17 +821,17 @@ class MultimodalAutoencoder:
             checkpoint_file = os.path.join(directory, checkpoint_name)
         else:
             checkpoint_file = tf.train.latest_checkpoint(directory)
-            print "Looking for checkpoin in directory", directory
+            print("Looking for checkpoin in directory", directory)
 
         if checkpoint_file is None:
-            print "Error! Cannot locate checkpoint in the directory"
+            print("Error! Cannot locate checkpoint in the directory")
             return
         else:
-            print "Found checkpoint file:", checkpoint_file
+            print("Found checkpoint file:", checkpoint_file)
 
         if npz_file_name is not None:
             npz_file_name = os.path.join(directory, npz_file_name)
-            print "Attempting to load saved reward values from file", npz_file_name
+            print("Attempting to load saved reward values from file", npz_file_name)
             npz_file = np.load(npz_file_name)
 
             self.train_loss = list(npz_file['train_loss'])
@@ -871,9 +871,9 @@ class MultimodalAutoencoder:
             A Boolean that will be true if the setting is different. 
         """
         if setting_name not in npz_file.keys():
-            print "ERROR! The setting", setting_name, "is not in the saved model file."
-            print "Using default value:", class_var
-            print ""
+            print("ERROR! The setting", setting_name, "is not in the saved model file.")
+            print("Using default value:", class_var)
+            print("")
             return False
         
         equal = True
@@ -888,11 +888,11 @@ class MultimodalAutoencoder:
             equal = False
             
         if not equal:
-            print "WARNING! Saved setting for", setting_name, "is different!"
-            print "\tModel's current value for", setting_name, "is", class_var
-            print "\tBut it was saved as", npz_file[setting_name]
-            print "Overwriting setting", setting_name, "with new value:", npz_file[setting_name]
-            print ""
+            print("WARNING! Saved setting for", setting_name, "is different!")
+            print("\tModel's current value for", setting_name, "is", class_var)
+            print("\tBut it was saved as", npz_file[setting_name])
+            print("Overwriting setting", setting_name, "with new value:", npz_file[setting_name])
+            print("")
         return True
     
     def set_classification_params(self, weight_penalty=None, learning_rate=None,
@@ -926,7 +926,7 @@ class MultimodalAutoencoder:
         self.classification_loss_func = loss_func if loss_func is not None else self.classification_loss_func
 
         if not suppress_warning:
-            print "In order for these changes to take effect, the model will now reconstruct the computation graph. Unsaved changes will be lost."
+            print("In order for these changes to take effect, the model will now reconstruct the computation graph. Unsaved changes will be lost.")
         self.rebuild_reinitialize()
 
     def predict(self, X):
@@ -989,17 +989,17 @@ class MultimodalAutoencoder:
         
         Returns: Float loss"""
         loss = self.get_performance_on_data(self.data_loader.val_X)
-        print "Final loss on validation data is:", loss
+        print("Final loss on validation data is:", loss)
         return loss
         
     def test_on_test(self):
         """Returns performance on the model's test set.
         
         Returns: Float loss"""
-        print "WARNING! Only test on the test set when you have finished choosing all of your hyperparameters!"
-        print "\tNever use the test set to choose hyperparameters!!!"
+        print("WARNING! Only test on the test set when you have finished choosing all of your hyperparameters!")
+        print("\tNever use the test set to choose hyperparameters!!!")
         loss = self.get_performance_on_data(self.data_loader.test_X)
-        print "Final loss on test data is:", loss
+        print("Final loss on test data is:", loss)
         return loss
 
     def get_performance_on_data(self, X):
@@ -1088,7 +1088,7 @@ class MultimodalAutoencoder:
         """
         if self.extra_noisy_data_loader is None:
             if self.extra_data_filename is None:
-                print "Error! Was not provided with location of extra data. Cannot perform this command"
+                print("Error! Was not provided with location of extra data. Cannot perform this command")
                 return
             else:
                 self.extra_noisy_data_loader = data_funcs.DataLoader(
@@ -1202,7 +1202,7 @@ class MultimodalAutoencoder:
             noisy_X = copy.deepcopy(X)
             noisy_X[:,start_i:end_i] = -1.0 * np.ones((len(X),end_i-start_i))
 
-            if self.verbose: print "DEBUG: feeding in noisy matrix. Average value over masked area:", np.mean(noisy_X[:,start_i:end_i])
+            if self.verbose: print("DEBUG: feeding in noisy matrix. Average value over masked area:", np.mean(noisy_X[:,start_i:end_i]))
 
             # Get reconstruction
             reconstruction, loss = self.predict(noisy_X)
@@ -1211,7 +1211,7 @@ class MultimodalAutoencoder:
             feats = X[:,start_i:end_i]
             reconstruct_feats = reconstruction[:,start_i:end_i]
             rms[i] = get_rmse(feats,reconstruct_feats)
-            print "RMS for modality", name, "is", rms[i], "\n"
+            print("RMS for modality", name, "is", rms[i], "\n")
         
         return rms
 

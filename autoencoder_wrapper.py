@@ -196,7 +196,7 @@ class MMAEWrapper(Wrapper):
         self.model.train(self.num_steps, record_every_nth=self.num_steps/10,
                          save_every_nth=self.num_steps+1)
         loss = self.model.get_performance_on_data_with_noise(self.data_loader.val_X)
-        print "\tLoss on fold", self.model.data_loader.fold, "was", loss
+        print ("Loss on fold", self.model.data_loader.fold, "was", loss)
         return loss
 
     def test_embedding_classification_quality(self):
@@ -256,7 +256,7 @@ class MMAEWrapper(Wrapper):
                                                                     self.classification_data_loader.clean_val_Y, l, 
                                                                     best_clean_acc, best_clean_auc)
                     except:
-                        print "Error! Could not fit SVM model for some reason!"
+                        print("Error! Could not fit SVM model for some reason!")
                         
                     
             label_accs[l] = best_acc
@@ -318,13 +318,13 @@ class MMAEWrapper(Wrapper):
             clean_accs = self.append_fold_results(clean_accs, f_clean_accs)
             clean_aucs = self.append_fold_results(clean_aucs, f_clean_aucs)
             
-        print "Losses for each fold:", losses
+        print("Losses for each fold:", losses)
         param_dict[self.optimize_for] = np.mean(losses)
 
         for i, label in enumerate(LABELS_TO_PREDICT):
             param_dict['svm_val_acc_'+label] = np.nanmean(accs[:,i])
             param_dict['svm_val_auc_'+label] = np.nanmean(aucs[:,i])
-            print "Average accuracy for label", label, "=", np.nanmean(accs[:,i])
+            print("Average accuracy for label", label, "=", np.nanmean(accs[:,i]))
 
             param_dict['svm_noisy_val_acc_'+label] = np.nanmean(noisy_accs[:,i])
             param_dict['svm_noisy_val_auc_'+label] = np.nanmean(noisy_aucs[:,i])
@@ -337,8 +337,8 @@ class MMAEWrapper(Wrapper):
         param_dict['svm_noisy_val_auc'] = np.nanmean(noisy_aucs)
         param_dict['svm_clean_val_acc'] = np.nanmean(clean_accs)
         param_dict['svm_clean_val_auc'] = np.nanmean(clean_aucs)
-        print "Average accuracy on noisy data", np.nanmean(noisy_accs)
-        print "Average accuracy on clean data", np.nanmean(clean_accs)
+        print("Average accuracy on noisy data", np.nanmean(noisy_accs))
+        print("Average accuracy on clean data", np.nanmean(clean_accs))
 
         return param_dict
 
@@ -372,8 +372,8 @@ class MMAEWrapper(Wrapper):
         """
         val_loss = self.train_and_predict(param_dict)
         loss = self.model.get_performance_on_data(self.data_loader.test_X)
-        print "\nFINAL TEST RESULTS:"
-        print self.loss_func, loss
+        print("\nFINAL TEST RESULTS:")
+        print(self.loss_func, loss)
 
     def run(self):
         """Runs the wrapper by checking all combinations of parameter settings, finding
@@ -385,30 +385,30 @@ class MMAEWrapper(Wrapper):
             best_setting = self.find_best_setting(optimize_for=metric)
 
 if __name__ == "__main__":
-    print "MMAE MODEL SELECTION"
-    print "\tThis code will sweep a set of parameters to find the ideal settings for an MMAE on a single dataset"
+    print("MMAE MODEL SELECTION")
+    print("This code will sweep a set of parameters to find the ideal settings for an MMAE on a single dataset")
 
     datasets_path = 'Data/Cleaned/'
     if len(sys.argv) < 2:
-        print "Error: usage is python autoencoder_wrapper.py <filename> <continue>"
-        print "\t<filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path
-        print "\t<continue>: optional. If 'True', the wrapper will pick up from where it left off by loading a previous validation results file"
+        print("Error: usage is python autoencoder_wrapper.py <filename> <continue>")
+        print("<filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path)
+        print("<continue>: optional. If 'True', the wrapper will pick up from where it left off by loading a previous validation results file")
         sys.exit()
     filename = sys.argv[1] #get data file from command line argument
-    print "\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename
-    print ""
+    print("\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename)
+    print("")
 
     if len(sys.argv) >= 3 and sys.argv[2] == 'True':
         cont = True
-        print "Okay, will continue from a previously saved validation results file for this problem"
+        print("Okay, will continue from a previously saved validation results file for this problem")
     else:
         cont = False
-    print ""
+    print("")
 
     wrapper = MMAEWrapper(filename, dropbox_path=PATH_TO_DROPBOX, datasets_path=datasets_path,
                           cont=cont)
 
-    print "\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv'
+    print("\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv')
 
     wrapper.run()
 

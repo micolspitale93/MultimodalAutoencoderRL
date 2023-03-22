@@ -2,6 +2,11 @@ MMAE wrapper - intelligent noise - no classification
 python autoencoder_wrapper.py all_modalities_present.csv True
 /some/path/on/your/server/where/output/goes/mmae_intelligent_noise_no_classification.txt
 
+
+python autoencoder_wrapper.py openface_features_turn_windows.csv True
+./Output/output.txt
+
+
 MMAE NN wrapper - happiness label only
 python autoencoder_classification_wrapper.py all_modalities_present.csv modalities_missing.csv happiness
 /some/path/on/your/server/where/output/goes/mmae_nn_specific_label_happiness.txt

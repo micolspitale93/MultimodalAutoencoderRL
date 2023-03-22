@@ -62,7 +62,7 @@ class DataLoader:
             noisy data. If true, will store extra variables for the noisy/clean data.
         """
         if not suppress_output:
-            print "-----Loading data-----"
+            print("-----Loading data-----")
 
         # memorize arguments
         self.filename = filename
@@ -110,10 +110,10 @@ class DataLoader:
 
         self.num_feats = self.get_feature_size()
         if not suppress_output: 
-            print len(self.train_X), "rows in training data"
-            print len(self.val_X), "rows in validation data"
-            print len(self.test_X), "rows in testing data"
-            print "Number of features:", self.num_feats
+            print(len(self.train_X), "rows in training data")
+            print(len(self.val_X), "rows in validation data")
+            print(len(self.test_X), "rows in testing data")
+            print("Number of features:", self.num_feats)
         
         # This code is used to find feature types within the feature names. 
         if extract_modalities:
@@ -123,12 +123,12 @@ class DataLoader:
             self.num_modalities = len(self.modality_dict)
 
             if not suppress_output:
-                print "Found the following feature types:"
+                print("Found the following feature types:")
                 for (i, val) in enumerate(self.modality_start_indices[:-1]):
-                    print "\t", self.modality_names[i], "starting at feature", val
+                    print ("\t", self.modality_names[i], "starting at feature", val)
             
         
-        print ""
+        print("")
     
     def get_matrices_from_df(self):
         """Extracts X and Y matrices from the class's dataframe based on the wanted 
@@ -357,10 +357,10 @@ class DataLoader:
                 num_filled += 1
             
             if plot_to_debug and num_filled > 10:
-                print "Okay you've looked at", num_filled, "plots, quitting now"
+                print("Okay you've looked at", num_filled, "plots, quitting now")
                 break
 
-        print "Filled", num_filled, "rows with reconstruction. This is", num_filled / float(i), "percent"
+        print("Filled", num_filled, "rows with reconstruction. This is", num_filled / float(i), "percent")
         return df
 
     def find_missing_modalities_indices(self, x):
@@ -416,11 +416,11 @@ def normalize_fill_df(data_df, wanted_feats, normalization='z_score', suppress_o
     if fill_gaps is not None:
         data_df = fill_gaps_in_modalities(data_df, fill_gaps, suppress_output=suppress_output)
 
-    if not suppress_output: print "Filling nan values with", fill_missing
+    if not suppress_output: print("Filling nan values with", fill_missing)
     data_df = data_df.fillna(fill_missing) #if dataset is already filled, won't do anything
 
     # Shuffle data
-    if not suppress_output: print "Randomly reshuffling data"
+    if not suppress_output: print("Randomly reshuffling data")
     data_df = data_df.sample(frac=1)
 
     return data_df
@@ -441,9 +441,9 @@ def remove_rows_with_no_label(data_df, wanted_labels, suppress_output=False):
     Returns: The dataframe with rows removed. 
     """
     if wanted_labels is not None:
-        if not suppress_output: print "Original data length was", len(data_df)
+        if not suppress_output: print("Original data length was", len(data_df))
         data_df = data_df.dropna(subset=wanted_labels, how='any')
-        if not suppress_output: print "After dropping rows with nan in any label column, length is", len(data_df)
+        if not suppress_output: print("After dropping rows with nan in any label column, length is", len(data_df))
     return data_df
 
 def get_wanted_feats_from_df(df):
@@ -556,7 +556,7 @@ def normalize_columns(df, wanted_feats, normalization='z_score'):
     
     Returns: the pandas dataframe with data modified so that it is normalized. 
     """
-    print "Normalizing data using", normalization, "method"
+    print("Normalizing data using", normalization, "method")
     train_df = df[df['dataset']=='Train']
     for feat in wanted_feats:
         feat_list = train_df[feat].dropna().tolist()
@@ -613,7 +613,7 @@ def remove_null_cols(df, features):
         for feat in null_cols_val:
             if feat not in null_cols:
                 null_cols.append(feat)
-        print "Found", len(null_cols), "columns that were completely null. Removing", null_cols
+        print("Found", len(null_cols), "columns that were completely null. Removing", null_cols)
 
         df = dropCols(df,null_cols)
         for col in null_cols:
@@ -650,11 +650,11 @@ def get_modality_dict(wanted_feats, subdivide_phys=False):
     Returns: A dictionary mapping each modality prefix to the index of the first feature 
         belonging to that modality. 
     """
-	modalities = list(set([get_feat_prefix(x, subdivide_phys=subdivide_phys) for x in wanted_feats]))
-	mod_dict = dict()
-	for modality in modalities:
-		mod_dict[modality] = get_start_index(wanted_feats, modality)
-	return mod_dict
+    modalities = list(set([get_feat_prefix(x, subdivide_phys=subdivide_phys) for x in wanted_feats]))
+    mod_dict = dict()
+    for modality in modalities:
+        mod_dict[modality] = get_start_index(wanted_feats, modality)
+    return mod_dict
 
 def get_start_index(wanted_feats, modality):
     """Gets the index of the first feature in the list that belongs to the modality. 
@@ -665,13 +665,13 @@ def get_start_index(wanted_feats, modality):
     
     Returns: An integer start index. 
     """
-	for i,s in enumerate(wanted_feats):
-		if modality[0:4] == 'phys' and 'H' in modality and modality != 'physTemp':
-			if modality + ':' in s:
-				return i
-		else:
-			if modality + '_' in s:
-				return i
+    for i,s in enumerate(wanted_feats):
+        if modality[0:4] == 'phys' and 'H' in modality and modality != 'physTemp':
+            if modality + ':' in s:
+                return i
+        else:
+            if modality + '_' in s:
+                return i
 
 def get_feat_prefix(feat_name, subdivide_phys=False):
     """Gets the prefix of a given string based on the first location of 
@@ -685,13 +685,13 @@ def get_feat_prefix(feat_name, subdivide_phys=False):
     
     Returns: The feature prefix not including the underscore.
     """
-	idx = feat_name.find('_')
-	prefix = feat_name[0:idx]
-	if not subdivide_phys or prefix != 'phys':
-		return prefix
-	else:
-		idx = feat_name.find(':')
-		return feat_name[0:idx]
+    idx = feat_name.find('_')
+    prefix = feat_name[0:idx]
+    if not subdivide_phys or prefix != 'phys':
+        return prefix
+    else:
+        idx = feat_name.find(':')
+        return feat_name[0:idx]
 
 def get_modality_names_indices(modality_dict):
     """Given a modality dict, sorts it according to the start indices (values)
@@ -747,9 +747,9 @@ def fill_gaps_in_modalities(df, fill_value, suppress_output=False, verbose=True)
 
                 if percent_nan > 0.8:
                     if verbose:
-                        print "Filling", current_prefix, 
-                        print "(index", prefix_start_index, "to", i_f, ") for person",
-                        print row, "because it was", percent_nan*100.0, "% empty"
+                        print("Filling", current_prefix),
+                        print("(index", prefix_start_index, "to", i_f, ") for person"),
+                        print(row, "because it was", percent_nan*100.0, "% empty")
                     for f in range(prefix_start_index, i_f):
                         df.ix[row,f] = fill_value
                     num_rows_filled += 1
@@ -765,7 +765,7 @@ def fill_gaps_in_modalities(df, fill_value, suppress_output=False, verbose=True)
             current_prefix = prefix
 
     if not suppress_output:
-        print "Filled gaps in", num_rows_filled, "rows with", fill_value
+        print("Filled gaps in", num_rows_filled, "rows with", fill_value)
     return df
 
 def count_gaps_in_modalities(df):
@@ -827,7 +827,7 @@ def count_gaps_in_modalities(df):
             missing_dict[missing_list] = 1
         
         if row % 20 == 0:
-            print "On row", row, "missing dict is:"
-            print missing_dict
+            print("On row", row, "missing dict is:")
+            print(missing_dict)
     
     return missing_dict
