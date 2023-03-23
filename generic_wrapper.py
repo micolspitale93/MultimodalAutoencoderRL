@@ -101,8 +101,8 @@ class Wrapper:
         #storing the results
         self.time_sum = 0
         if cont:
-            self.val_results_df = pd.DataFrame.from_csv(self.results_path + self.save_prefix + '.csv')
-            print '\nPrevious validation results df loaded. It has', len(self.val_results_df), "rows"
+            self.val_results_df = pd.read_csv(self.results_path + self.save_prefix + '.csv')
+            print('\nPrevious validation results df loaded. It has', len(self.val_results_df), "rows")
             self.started_from = len(self.val_results_df)
         else:
             self.val_results_df = pd.DataFrame()
@@ -117,15 +117,15 @@ class Wrapper:
                 self.params['C'] = [1,10,100]
                 self.params['beta'] = [.001, .01, .1]
         """
-        print "Error! define_params should be overwritten in child class"
+        print("Error! define_params should be overwritten in child class")
         raise NotImplementedError
 
     def train_and_predict(self, param_dict):
-        print "Error! train_model_for_task should be overwritten in child class"
+        print("Error! train_model_for_task should be overwritten in child class")
         raise NotImplementedError
 
     def test_on_test(self, param_dict):
-        print "Error! train_model_for_task should be overwritten in child class"
+        print("Error! train_model_for_task should be overwritten in child class")
         raise NotImplementedError
     
     # The following functions do not need to be overwritten in the child class.
@@ -164,7 +164,7 @@ class Wrapper:
                 a parameter is not in this_param_dict's keys, a setting for it has not been chosen yet.
             debug: A Boolean. If True, will print debugging statements.
         """
-        if debug: print "Working on a parameter dict containing", this_param_dict
+        if debug: print("Working on a parameter dict containing", this_param_dict)
         for key in self.params.keys():
             if key in this_param_dict:
                 continue
@@ -172,17 +172,17 @@ class Wrapper:
                 try:
                     this_setting = param_settings_left[key].pop()
                 except:
-                    print "ERROR! could not pop from param_setting", key, "which is", param_settings_left[key]
-                if debug: print "Popped", key, "=", this_setting, "off the params left"
+                    print("ERROR! could not pop from param_setting", key, "which is", param_settings_left[key])
+                if debug: print("Popped", key, "=", this_setting, "off the params left")
                 if len(param_settings_left[key]) > 0:
-                    if debug: print "Recursing on remaining parameters", param_settings_left
+                    if debug: print("Recursing on remaining parameters", param_settings_left)
                     self.recurse_and_append_params(copy.deepcopy(param_settings_left), 
                                                    copy.deepcopy(this_param_dict))
-                if debug: print "Placing the popped setting", key, "=", this_setting, "into the parameter dict"
+                if debug: print("Placing the popped setting", key, "=", this_setting, "into the parameter dict")
                 this_param_dict[key] = this_setting
                 
         self.list_of_param_settings.append(this_param_dict)
-        if debug: print "Appending parameter dict to list:", this_param_dict, "\n"
+        if debug: print("Appending parameter dict to list:", this_param_dict, "\n")
     
     def get_save_prefix(self, filename, replace=False):
         """Computes a prefix to use when saving results files based on the classifier
@@ -217,7 +217,7 @@ class Wrapper:
             mini_df = mini_df[mini_df[key] == setting]
             if len(mini_df) == 0:
                 return False
-        print "Setting already tested"
+        print("Setting already tested")
         return True
 
     def convert_param_dict_for_use(self, setting_dict):
@@ -240,13 +240,13 @@ class Wrapper:
 
         if 'batch_size' in setting_dict.keys():
             setting_dict['batch_size'] = int(setting_dict['batch_size'])
-            print "batch size just got changed in convert_param_dict. It's an", type(setting_dict['batch_size'])
+            print("batch size just got changed in convert_param_dict. It's an", type(setting_dict['batch_size']))
         return setting_dict
 
     def sweep_all_parameters(self):
         """Runs through all of the computed combinations of hyperparameter settings, 
         storing the results of testing with each."""
-        print "\nYou have chosen to test a total of", self.num_settings, "settings"
+        print("\nYou have chosen to test a total of", self.num_settings, "settings")
         sys.stdout.flush()
 
         #sweep all possible combinations of parameters
@@ -255,7 +255,7 @@ class Wrapper:
             
         self.val_results_df.to_csv(self.results_path + self.save_prefix + '.csv')
 
-        print "\n--------------PARAMETER SWEEP IS COMPLETE--------------"
+        print("\n--------------PARAMETER SWEEP IS COMPLETE--------------")
 
     def test_one_setting(self, param_dict):
         """Tests a single setting of the hyperparameters.
@@ -277,8 +277,8 @@ class Wrapper:
         this_time = t1 - t0
         self.time_sum = self.time_sum + this_time
         
-        print "\n", self.val_results_df.tail(n=1)
-        print "It took", this_time, "seconds to obtain this result"
+        print("\n", self.val_results_df.tail(n=1))
+        print("It took", this_time, "seconds to obtain this result")
         self.print_time_estimate()
         
         sys.stdout.flush()
@@ -298,7 +298,7 @@ class Wrapper:
         for f in range(self.num_cross_folds):
             self.data_loader.set_to_cross_validation_fold(f)
             scores.append(self.train_and_predict(param_dict))
-        print "Scores for each fold:", scores
+        print("Scores for each fold:", scores)
         param_dict[self.optimize_for] = np.mean(scores)
         return param_dict
 
@@ -311,8 +311,8 @@ class Wrapper:
         total_secs_remaining = int(avg_time * num_remaining)
         hours, mins, secs = helper.get_secs_mins_hours_from_secs(total_secs_remaining)
 
-        print "\n", num_done, "settings processed so far,", num_remaining, "left to go"
-        print "Estimated time remaining:", hours, "hours", mins, "mins", secs, "secs"
+        print("\n", num_done, "settings processed so far,", num_remaining, "left to go")
+        print("Estimated time remaining:", hours, "hours", mins, "mins", secs, "secs")
 
     def find_best_setting(self, optimize_for=None, min_or_max=None):
         """After all testing is finished, locates the row in the results file that 
@@ -339,10 +339,10 @@ class Wrapper:
         best_idx = scores.index(best_score)
         best_setting = self.val_results_df.iloc[best_idx]
 
-        print "\nThe best", optimize_for, "was", best_setting[optimize_for]
-        print "It was found with the following settings:"
-        print best_setting
-        print "\n"
+        print("\nThe best", optimize_for, "was", best_setting[optimize_for])
+        print("It was found with the following settings:")
+        print(best_setting)
+        print("\n")
 
         return best_setting
 
@@ -352,15 +352,15 @@ class Wrapper:
         best_setting = self.find_best_setting()
         
         if not self.check_test:
-            print "check_test is set to false, Will not evaluate performance on held-out test set."
+            print("check_test is set to false, Will not evaluate performance on held-out test set.")
             return
-        print "\nAbout to evaluate results on held-out test set!!"
-        print "Will use the settings that produced the best", optimize_for
+        print("\nAbout to evaluate results on held-out test set!!")
+        print("Will use the settings that produced the best", optimize_for)
         
         best_setting = self.convert_param_dict_for_use(best_setting)
         test_score = self.test_on_test(best_setting)
 
-        print "\nFINAL TEST RESULTS:", test_score
+        print("\nFINAL TEST RESULTS:", test_score)
         
     def run(self):
         """Tests all of the settings, then finds the best one and possibly tests on the 
@@ -399,7 +399,7 @@ class ClassificationWrapper(Wrapper):
                          cross_validation=cross_validation)
     
     def predict_on_data(self, X):
-        print "Error! predict_on_data should be overwritten in child class"
+        print("Error! predict_on_data should be overwritten in child class")
         raise NotImplementedError
     
     def load_data(self):
@@ -479,7 +479,7 @@ class ClassificationWrapper(Wrapper):
                 clean_acc.append(acc)
                 clean_auc.append(auc)
 
-        print "Accuracy for each fold:", all_auc
+        print("Accuracy for each fold:", all_auc)
         param_dict['val_acc'] = np.nanmean(all_acc)
         param_dict['val_auc'] = np.nanmean(all_auc)
         param_dict['val_f1'] = np.nanmean(all_f1)
@@ -489,10 +489,10 @@ class ClassificationWrapper(Wrapper):
         if self.check_noisy_data:
             param_dict['noisy_val_acc'] = np.nanmean(noisy_acc)
             param_dict['noisy_val_auc'] = np.nanmean(noisy_auc)
-            print "Perf on noisy data:", np.nanmean(noisy_acc), "acc", np.nanmean(noisy_auc), "auc"
+            print("Perf on noisy data:", np.nanmean(noisy_acc), "acc", np.nanmean(noisy_auc), "auc")
             param_dict['clean_val_acc'] = np.nanmean(clean_acc)
             param_dict['clean_val_auc'] = np.nanmean(clean_auc)
-            print "Perf on clean data:", np.nanmean(clean_acc), "acc", np.nanmean(clean_auc), "auc"
+            print("Perf on clean data:", np.nanmean(clean_acc), "acc", np.nanmean(clean_auc), "auc")
 
         return param_dict
     
@@ -504,7 +504,7 @@ class ClassificationWrapper(Wrapper):
             predictions added as an extra column.
         """
         df = copy.deepcopy(self.data_loader.df)
-        X = df[self.data_loader.wanted_feats].as_matrix()
+        X = df[self.data_loader.wanted_feats].values
         preds = self.predict_on_data(X)
         assert(len(X) == len(preds))
         for i,label in enumerate(self.data_loader.wanted_labels):
@@ -517,34 +517,34 @@ class ClassificationWrapper(Wrapper):
         for metric in ['val_acc', 'noisy_val_acc', 'clean_val_acc']:
             if metric in self.val_results_df.columns.values:
                 best_setting = self.find_best_setting(optimize_for=metric, min_or_max='max')
-                print "\nThe best", metric, "was", best_setting[metric]
-                print "It was found with the following settings:"
-                print best_setting
+                print("\nThe best", metric, "was", best_setting[metric])
+                print("It was found with the following settings:")
+                print(est_setting)
 
         if not self.check_test:
-            print "check_test is set to false, Will not evaluate performance on held-out test set."
+            print("check_test is set to false, Will not evaluate performance on held-out test set.")
             return
-        print "\nAbout to evaluate results on held-out test set!!"
-        print "Will use the settings that produced the best", self.optimize_for
+        print("\nAbout to evaluate results on held-out test set!!")
+        print("Will use the settings that produced the best", self.optimize_for)
         
         best_setting = self.convert_param_dict_for_use(best_setting)
         preds = self.test_on_test(best_setting)
         true_y = true_y = self.data_loader.test_Y
         acc, auc, f1, precision, recall = compute_all_classification_metrics(preds, true_y)
 
-        print "\nFINAL TEST RESULTS ON ALL DATA:"
-        print 'Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall
+        print("\nFINAL TEST RESULTS ON ALL DATA:")
+        print('Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall)
 
         if self.check_noisy_data:
             noisy_preds = self.predict_on_data(self.data_loader.noisy_test_X)
             acc, auc, f1, precision, recall = compute_all_classification_metrics(noisy_preds, self.data_loader.noisy_test_Y)
-            print "\nFINAL TEST RESULTS ON NOISY DATA:"
-            print 'Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall
+            print("\nFINAL TEST RESULTS ON NOISY DATA:")
+            print('Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall)
 
             clean_preds = self.predict_on_data(self.data_loader.clean_test_X)
             acc, auc, f1, precision, recall = compute_all_classification_metrics(clean_preds, self.data_loader.clean_test_Y)
-            print "\nFINAL TEST RESULTS ON CLEAN DATA:"
-            print 'Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall
+            print("\nFINAL TEST RESULTS ON CLEAN DATA:")
+            print('Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall)
 
 def get_baseline(Y):
     """Gets the proportion of the class label that is most frequent in the data.
@@ -571,8 +571,8 @@ def compute_classification_metric(metric, true_y, preds):
     """
     try:
         result = metric(true_y, preds)
-    except Exception, e:
-        print "Error in computing metric:", e
+    except Exception:
+        print("Error in computing metric:")
         return np.nan
     return result
 

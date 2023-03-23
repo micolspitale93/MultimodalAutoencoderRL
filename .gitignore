@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+Output/*
+Data/*
+Anaconda3-2020.11-Linux-x86_64.sh
+

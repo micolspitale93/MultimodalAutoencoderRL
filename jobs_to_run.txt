@@ -3,8 +3,7 @@ python autoencoder_wrapper.py all_modalities_present.csv True
 /some/path/on/your/server/where/output/goes/mmae_intelligent_noise_no_classification.txt
 
 
-python autoencoder_wrapper.py openface_features_turn_windows.csv True
-./Output/output.txt
+python autoencoder_wrapper.py openface_features_turn_windows.csv True ./Output/output.txt
 
 
 MMAE NN wrapper - happiness label only

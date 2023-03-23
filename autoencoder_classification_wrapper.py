@@ -217,7 +217,7 @@ class MMAEClassificationWrapper(ClassificationWrapper):
         self.model.train(self.mmae_num_steps, record_every_nth=self.mmae_num_steps/10,
                          save_every_nth=self.mmae_num_steps*2)
         loss = self.model.get_performance_on_data_with_noise(unsup_predict_X)
-        print "\tFinished training MMAE, loss was", loss
+        print("\tFinished training MMAE, loss was", loss)
         
         self.model.train_classification(num_steps=self.classification_num_steps,
                                         record_every_nth=self.classification_num_steps/10, 
@@ -275,11 +275,11 @@ class MMAEClassificationWrapper(ClassificationWrapper):
                 for l in range(num_labels):
                     (all_acc[f,l], all_auc[f,l], all_f1[f,l], 
                     all_precision[f,l], all_recall[f,l]) = gen_wrap.compute_all_classification_metrics(preds[:,l], true_y[:,l])
-                print "\tFinished training classifier, average acc was", np.mean(all_auc[f,:])
+                print("\tFinished training classifier, average acc was", np.mean(all_auc[f,:]))
             else:
                 (all_acc[f], all_auc[f], all_f1[f], 
                  all_precision[f], all_recall[f]) = gen_wrap.compute_all_classification_metrics(preds, true_y)
-                print "\tFinished training classifier, acc was", all_acc[f]
+                print("\tFinished training classifier, acc was", all_acc[f])
 
             if self.check_noisy_data:
                 noisy_preds = self.predict_on_data(self.classification_data_loader.noisy_val_X)
@@ -303,20 +303,20 @@ class MMAEClassificationWrapper(ClassificationWrapper):
         param_dict['val_f1'] = np.nanmean(all_f1)
         param_dict['val_precision'] = np.nanmean(all_precision)
         param_dict['val_recall'] = np.nanmean(all_recall)
-        print "Finished training all folds, average acc was", np.nanmean(all_acc)
+        print("Finished training all folds, average acc was", np.nanmean(all_acc))
         if self.wanted_label is None:
             for i,label in enumerate(LABELS_TO_PREDICT):
                 param_dict['val_acc_'+label] = np.nanmean(all_acc[:,i])
                 param_dict['val_auc_'+label] = np.nanmean(all_auc[:,i])
-                print "Average accuracy for label", label, "=", np.nanmean(all_acc[:,i])
+                print("Average accuracy for label", label, "=", np.nanmean(all_acc[:,i]))
 
         if self.check_noisy_data:
             param_dict['noisy_val_acc'] = np.nanmean(noisy_acc)
             param_dict['noisy_val_auc'] = np.nanmean(noisy_auc)
-            print "Perf on noisy data:", np.nanmean(noisy_acc), "acc", np.nanmean(noisy_auc), "auc"
+            print("Perf on noisy data:", np.nanmean(noisy_acc), "acc", np.nanmean(noisy_auc), "auc")
             param_dict['clean_val_acc'] = np.nanmean(clean_acc)
             param_dict['clean_val_auc'] = np.nanmean(clean_auc)
-            print "Perf on clean data:", np.nanmean(clean_acc), "acc", np.nanmean(clean_auc), "auc"
+            print("Perf on clean data:", np.nanmean(clean_acc), "acc", np.nanmean(clean_auc), "auc")
 
             if self.wanted_label is None:
                 for i, label in enumerate(LABELS_TO_PREDICT):
@@ -331,30 +331,30 @@ class MMAEClassificationWrapper(ClassificationWrapper):
         """Find the best setting and use it to test on the test data and
         print the results."""
         best_setting = self.find_best_setting()
-        print "\nThe best", self.optimize_for, "was", best_setting[self.optimize_for]
-        print "It was found with the following settings:"
-        print best_setting
+        print("\nThe best", self.optimize_for, "was", best_setting[self.optimize_for])
+        print("It was found with the following settings:")
+        print(best_setting)
 
         if not self.check_test:
-            print "check_test is set to false, Will not evaluate performance on held-out test set."
+            print("check_test is set to false, Will not evaluate performance on held-out test set.")
             return
-        print "\nAbout to evaluate results on held-out test set!!"
-        print "Will use the settings that produced the best", optimize_for
+        print("\nAbout to evaluate results on held-out test set!!")
+        print("Will use the settings that produced the best", optimize_for)
         
         best_setting = self.convert_param_dict_for_use(best_setting)
         
-        print "\nFINAL TEST RESULTS:"
+        print("\nFINAL TEST RESULTS:")
         loss, preds = self.test_on_test(best_setting)
         true_y = self.classification_data_loader.test_Y
         accs = []
         aucs = []
         for i,label in enumerate(LABELS_TO_PREDICT):
             acc, auc, f1, precision, recall = gen_wrap.compute_all_classification_metrics(preds[:,i], true_y[:,i])
-            print label, 'Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall
+            print(label, 'Acc:', acc, 'AUC:', auc, 'F1:', f1, 'Precision:', precision, 'Recall:', recall)
             accs.append(acc)
             aucs.append(auc)
         
-        print "Overall:", 'Acc:', np.mean(accs), 'AUC:', np.mean(aucs)
+        print("Overall:", 'Acc:', np.mean(accs), 'AUC:', np.mean(aucs))
 
     def test_on_test(self, param_dict):
         """Trains the model and tests it on the tests data. 
@@ -369,21 +369,21 @@ class MMAEClassificationWrapper(ClassificationWrapper):
         return train_and_predict(self, param_dict, predict_on='Test')
 
 if __name__ == "__main__":
-    print "MMAE NN MODEL SELECTION"
-    print "\tThis code will sweep a set of parameters to find the ideal settings for an MMAE+NN on a single dataset"
+    print("MMAE NN MODEL SELECTION")
+    print("\tThis code will sweep a set of parameters to find the ideal settings for an MMAE+NN on a single dataset")
 
     datasets_path = 'Data/Cleaned/'
     if len(sys.argv) < 3:
-        print "Error: usage is python svm.py <filename> <label> <continue>"
-        print "\t<MMAE filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path
-        print "\t<classification filename>: e.g. modalities_missing.csv - program will look in the same directory for this file and use it for classification data"
-        print "\t<extra arguments>: optional. If 'True', the wrapper will continue from where it left off by loading a previous validation results file",
-        print "if the name of a label, the wrapper will only train to classify on that label. Can have multiple extra arguments, e.g. happiness True"
+        print("Error: usage is python svm.py <filename> <label> <continue>")
+        print("\t<MMAE filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path)
+        print("\t<classification filename>: e.g. modalities_missing.csv - program will look in the same directory for this file and use it for classification data")
+        print("\t<extra arguments>: optional. If 'True', the wrapper will continue from where it left off by loading a previous validation results file")
+        print("if the name of a label, the wrapper will only train to classify on that label. Can have multiple extra arguments, e.g. happiness True")
         sys.exit()
     filename = sys.argv[1] #get data file from command line argument
     classification_filename = sys.argv[2]
-    print "\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename
-    print ""
+    print("\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename)
+    print("")
 
     if len(sys.argv) >=4:
         extra_args = sys.argv[3]
@@ -395,14 +395,13 @@ if __name__ == "__main__":
 
     if len(sys.argv) >= 5 and sys.argv[4] == 'True':
         cont = True
-        print "Okay, will continue from a previously saved validation results file for this problem"
+        print("Okay, will continue from a previously saved validation results file for this problem")
     else:
         cont = False
-    print ""
+    print("")
 
     wrapper = MMAEClassificationWrapper(filename, classification_filename, dropbox_path=PATH_TO_DROPBOX, 
                                         datasets_path=datasets_path, cont=cont, wanted_label=label)
-
-    print "\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv'
+    print("\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv')
 
     wrapper.run()

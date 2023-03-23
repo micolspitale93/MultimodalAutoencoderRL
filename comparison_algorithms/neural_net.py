@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -85,8 +85,8 @@ class NeuralNetwork:
         self.input_size = self.data_loader.get_feature_size()
         self.output_size = self.data_loader.num_labels
         if self.verbose:
-            print "Input dimensions (number of features):", self.input_size
-            print "Number of classes/outputs:", self.output_size
+            print("Input dimensions (number of features):", self.input_size)
+            print("Number of classes/outputs:", self.output_size)
         
         # Set up tensorflow computation graph.
         self.graph = tf.Graph()

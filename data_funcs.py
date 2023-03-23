@@ -79,7 +79,7 @@ class DataLoader:
         self.separate_noisy_data = separate_noisy_data
 
         # Extract dataframe from csv
-        self.df = pd.DataFrame.from_csv(filename)
+        self.df = pd.read_csv(filename)
         if self.cross_validation:
             self.df = self.assign_cross_val_folds(self.df)
             self.fold = 0
@@ -325,7 +325,7 @@ class DataLoader:
         Returns: the dataframe with the missing data replaced with the 
             reconstruction. 
         """
-        X = df[self.wanted_feats].as_matrix()
+        X = df[self.wanted_feats].values
 
         num_filled = 0
         for i in range(len(df)):
@@ -486,7 +486,7 @@ def get_matrix_for_dataset(data_df, wanted_feats, dataset):
     else:
         set_df = data_df[data_df['dataset']==dataset]
     
-    X = set_df[wanted_feats].astype(float).as_matrix()
+    X = set_df[wanted_feats].astype(float).values
     X = convert_matrix_tf_format(X)
 
     return X
@@ -514,7 +514,7 @@ def get_matrices_for_dataset(data_df, wanted_feats, wanted_labels, dataset=None,
     else:
         set_df = data_df[data_df['dataset']==dataset]
     
-    X = set_df[wanted_feats].astype(float).as_matrix()
+    X = set_df[wanted_feats].astype(float).values
     X = convert_matrix_tf_format(X)
     
     if wanted_labels is None:
@@ -523,7 +523,7 @@ def get_matrices_for_dataset(data_df, wanted_feats, wanted_labels, dataset=None,
         if len(wanted_labels) == 1:
             y = set_df[wanted_labels[0]].tolist()
         else:
-            y = set_df[wanted_labels].as_matrix()
+            y = set_df[wanted_labels].values
         y = np.asarray(y)
     
         if labels_to_sign:

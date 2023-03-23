@@ -137,8 +137,8 @@ class SVMWrapper(ClassificationWrapper):
         return self.train_and_predict(param_dict, predict_on='test')
 
 if __name__ == "__main__":
-    print "SVM MODEL SELECTION"
-    print "\tThis code will sweep a set of parameters to find the ideal settings for an SVM on a single dataset"
+    print("SVM MODEL SELECTION")
+    print("\tThis code will sweep a set of parameters to find the ideal settings for an SVM on a single dataset")
 
     if Z_SCORE_FILL_WITH_0:
         normalize_and_fill = True
@@ -150,28 +150,28 @@ if __name__ == "__main__":
         normalization = 'between_0_and_1'
 
     if len(sys.argv) < 3:
-        print "Error: usage is python svm.py <filename> <label> <continue>"
-        print "\t<filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path
-        print "\t<label>: e.g. 'happiness' - the classification label you are trying to predict"
-        print "\t<continue>: optional. If 'True', the wrapper will pick up from where it left off by loading a previous validation results file"
+        print("Error: usage is python svm.py <filename> <label> <continue>")
+        print("\t<filename>: e.g. all_modalities_present.csv - program will look in the following directory for this file", DEFAULT_MAIN_DIRECTORY + datasets_path)
+        print("\t<label>: e.g. 'happiness' - the classification label you are trying to predict")
+        print("\t<continue>: optional. If 'True', the wrapper will pick up from where it left off by loading a previous validation results file")
         sys.exit()
     filename = sys.argv[1] #get data file from command line argument
-    print "\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename
-    print ""
+    print("\nLoading dataset", DEFAULT_MAIN_DIRECTORY + datasets_path + filename)
+    print("")
 
     label = sys.argv[2]
 
     if len(sys.argv) >= 4 and sys.argv[3] == 'True':
         cont = True
-        print "Okay, will continue from a previously saved validation results file for this problem"
+        print("Okay, will continue from a previously saved validation results file for this problem")
     else:
         cont = False
-    print ""
+    print("")
 
     wrapper = SVMWrapper(filename, dropbox_path=DEFAULT_MAIN_DIRECTORY, datasets_path=datasets_path,
                           cont=cont, wanted_label=label, normalize_and_fill=normalize_and_fill,
                           normalization=normalization)
 
-    print "\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv'
+    print("\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv')
 
     wrapper.run()

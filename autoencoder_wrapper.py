@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import os
 import sys
 from sklearn.svm import SVC
@@ -8,7 +8,7 @@ from sklearn.svm import SVC
 CODE_PATH = os.path.dirname(os.getcwd())
 sys.path.append(CODE_PATH)
 
-DEFAULT_MAIN_DIRECTORY = '/Your/path/here/'
+DEFAULT_MAIN_DIRECTORY = '/root/multimodal_autoencoder_ws/MultimodalAutoencoderRL/'
 
 import multimodal_autoencoder as mmae
 import data_funcs
@@ -405,8 +405,7 @@ if __name__ == "__main__":
         cont = False
     print("")
 
-    wrapper = MMAEWrapper(filename, dropbox_path=PATH_TO_DROPBOX, datasets_path=datasets_path,
-                          cont=cont)
+    wrapper = MMAEWrapper(filename, datasets_path=datasets_path, cont=cont)
 
     print("\nThe validation results dataframe will be saved in:", wrapper.results_path + wrapper.save_prefix + '.csv')
 

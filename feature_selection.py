@@ -11,7 +11,7 @@ def load_raw_data(datasets_path, mmae_filename):
 		datasets_path: A string path to the file location.
 		mmae_filename: The name of the actual file.
 	"""
-    df = pd.DataFrame.from_csv(datasets_path+mmae_filename)
+    df = pd.read_csv(datasets_path+mmae_filename)
     
     feat_cols = [x for x in df.columns.values if 'user_id' not in x and 
                                                      'timestamp' not in x and
@@ -23,8 +23,8 @@ def load_raw_data(datasets_path, mmae_filename):
 
     logistic_cols = [c for c in df.columns.values if c not in feat_cols]
     
-    X_train = df[df["dataset"]=="Train"][feat_cols].as_matrix()
-    X_all = df[feat_cols].as_matrix()
+    X_train = df[df["dataset"]=="Train"][feat_cols].values
+    X_all = df[feat_cols].values
 
     return df, X_train, X_all, logistic_cols 
 
@@ -83,7 +83,7 @@ def create_transformed_dataset(datasets_path, filename, transform_type,num_featu
 		assert label is not None, "label parameter required for skb transformation"
 		assert label in logistic_cols, "label must be in the dataframe"
 
-		Y_train = df[label][df["dataset"]=="Train"].as_matrix()
+		Y_train = df[label][df["dataset"]=="Train"].values
 		idx = np.isnan(Y_train)
 
 		X_train = X_train[~idx,:]
@@ -94,7 +94,7 @@ def create_transformed_dataset(datasets_path, filename, transform_type,num_featu
 
 	transformed_cols = logistic_cols + ["{0}_dim{1}".format(transform_type,i) for i in range(num_features)]
 
-	transformed_df = pd.DataFrame(np.hstack([df[logistic_cols].as_matrix(), transformed_X]),columns = transformed_cols)
+	transformed_df = pd.DataFrame(np.hstack([df[logistic_cols].values, transformed_X]),columns = transformed_cols)
 	
 	transformed_df.to_csv(datasets_path+transform_prefix+mmae_filename)
 

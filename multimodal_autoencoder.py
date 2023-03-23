@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1 as tf
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 import sys
@@ -200,10 +202,7 @@ class MultimodalAutoencoder:
         if self.intelligent_noise:
             print("Using intelligent noise")
             self.noise_type_percentages = [ 0.64018104,  0.03168217,  0.25119437,  0.07694242]
-            self.noise_types = [[],
-                                ['call','sms','screen'],
-                                ['location'],
-                                ['location','call','sms','screen']]
+            self.noise_types = [[],[" gaze"],[' AU01'],[' AU02'],[' AU04'], [' gaze', ' AU01', ' AU02', ' AU04']]
 
         if self.classification_layer_sizes is not None:
             if self.verbose: print("Okay, preparing model to perform classification")
@@ -348,6 +347,7 @@ class MultimodalAutoencoder:
 
         with self.graph.as_default():
             # Data placeholder
+            tf.disable_v2_behavior() 
             self.noisy_X = tf.placeholder(tf.float32, name="noisy_X")
             self.true_X = tf.placeholder(tf.float32, name="true_X")
             
@@ -677,6 +677,7 @@ class MultimodalAutoencoder:
         """
         new_X = copy.deepcopy(X)
         num_feats = np.shape(new_X)[1]
+        #print("NUM_FEATURES ", num_feats)
         for i in range(len(new_X)):
             # randomly 0 out 5% of the data 
             idx = np.random.choice(num_feats, size=int(num_feats*.05))
@@ -691,6 +692,7 @@ class MultimodalAutoencoder:
                 if len(missing_modes)>0:
                     missing_modalities = missing_modes
                 for m in missing_modalities:
+                    print(m, self.data_loader.modality_names)
                     mod_i = self.data_loader.modality_names.index(m)
                     new_X = self.mask_modality(new_X, i, mod_i)
             else:
@@ -1052,7 +1054,7 @@ class MultimodalAutoencoder:
             The same dataframe with the predictions added as a column. 
         """
         df = copy.deepcopy(self.classification_data_loader.df)
-        X = df[self.classification_data_loader.wanted_feats].as_matrix()
+        X = df[self.classification_data_loader.wanted_feats].values
         preds = self.get_classification_predictions(X)
         assert(len(X) == len(preds))
         for i,label in enumerate(self.classification_data_loader.wanted_labels):
@@ -1142,7 +1144,7 @@ class MultimodalAutoencoder:
             file_descriptor: A string to use in saving the new embedding file. 
         """
         # Load file with pandas
-        df = pd.DataFrame.from_csv(path + filename)
+        df = pd.read_csv(path + filename)
 
         wanted_feats = data_funcs.get_wanted_feats_from_df(df)
         # TODO: add an assert to check this is exactly the same as self.data_loader.wanted_feats
@@ -1174,10 +1176,10 @@ class MultimodalAutoencoder:
             file_descriptor: A string to use in saving the new reconstructed file. 
         """
         # Load csv with pandas
-        df = pd.DataFrame.from_csv(path + filename)
+        df = pd.read_csv(path + filename)
 
         # Get actual data from file, feed it through the autoencoder
-        X = df[self.data_loader.wanted_feats].as_matrix()
+        X = df[self.data_loader.wanted_feats].values
         Xbar, loss = self.predict(X)
 
         # Fill gaps that were originally missing in the file with the reconstruction
